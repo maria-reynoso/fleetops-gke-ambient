@@ -21,15 +21,31 @@ Retrieve credentials:
 gcloud container clusters get-credentials $CLUSTER_NAME
 ```
 
-### Install Istio
-
-Create Namespace
+### Creating the Cluster and Installing cert-manager
 
 ```sh
-kubectl create ns istio-system
+# Helm setup
+helm repo add jetstack https://charts.jetstack.io
+helm repo update
+
+# install cert-manager CRDs
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.5/cert-manager.crds.yaml
+
+# install cert-manager; this might take a little time
+helm install cert-manager jetstack/cert-manager \
+	--namespace cert-manager \
+	--create-namespace \
+	--version v1.14.5
+
+# We need this namespace to exist since our cert will be placed there
+kubectl create namespace istio-system
 ```
 
-Create a ResourceQuota
+### Install Istio with ambient mode
+
+By default in GKE, only kube-system has a defined ResourceQuota for the node-critical class. istio-cni and ztunnel both require the node-critical class, check the [docs](https://istio.io/latest/docs/ambient/install/platform-prerequisites/#google-kubernetes-engine-gke)
+
+Create ResourceQuota into istio-system namespace:
 
 ```sh
 cat <<EOF | kubectl apply -f -
