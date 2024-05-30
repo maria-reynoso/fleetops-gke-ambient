@@ -1,6 +1,8 @@
 # fleetops-gke-ambient
 
 ## Deploy cluster
+
+ <!-- TODO: Deploy with Makefile -->
 ```sh
 export PROJECT_ID=`gcloud config get-value project` && \
 export M_TYPE=n1-standard-2 && \
