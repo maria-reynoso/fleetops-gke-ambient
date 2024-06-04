@@ -2,13 +2,8 @@
 
 ## Pre-requisites
 - Have a cluster running a supported version of Kubernetes (1.27, 1.28, 1.29, 1.30), (GKE for this case) which has outbound access to the internet, specifically using a tenant from the TLS Protect Cloud domain.
-- A valid Venafi Cloud Firefly account. You can sign up for a 30 day trial here
+- A valid Venafi Cloud Firefly account. You can sign up for a 30 day trial [here](https://venafi.com/try-venafi/firefly/)
 - Network access to our public ECR repository domain (registry.venafi.cloud/public/venafi-images) to pull our public image and OCI chart
-- Install cert-manager
-  - Install istio-csr via Helm
-- An RSA public private pem key pair, which can be generated using OpenSSL
-- Install Istio ambient mode (https://istio.io/latest/docs/ambient/getting-started/)
-  - Download latest Istio version (1.22)
 
 
 ## Deploy cluster
@@ -56,11 +51,26 @@ kubectl create namespace istio-system
 
 ## TLS Protect Cloud setup
 
-- Signup for a Venafi account if you don't have one
-- Submit the RSA public key to create a service account in the Firefly UI
-- Create workload certificate policy
-- Create sub-ca provider
-- Create configuration
+1. Signup for a [Venafi account](https://venafi.com/try-venafi/firefly/) if you don't have one
+
+2. Generate an RSA public private pem key pair using OpenSSL:
+
+  ```sh
+  openssl genrsa -out key.pem
+  openssl rsa -in key.pem -outform PEM -pubout -out public.pem
+  ```
+
+3. Create a service account in the Firefly UI using the RSA public key you generated above. You can refer to the [documentation](https://docs.venafi.cloud/firefly/service-accounts/#create-a-new-service-account) for more details.
+
+Copy the CLIENT_ID from the service account just created.
+
+```sh
+CLIENT_ID=39687224-228e-11ef-abc9-9618982ef33c
+```
+
+4. Create workload certificate policy
+5. Create sub-ca provider
+6. Create configuration
 
 ## Firefly Helm chart installation
 
