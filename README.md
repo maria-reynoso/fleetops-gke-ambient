@@ -68,9 +68,11 @@ Copy the CLIENT_ID from the service account just created.
 CLIENT_ID=39687224-228e-11ef-abc9-9618982ef33c
 ```
 
-4. Create workload certificate policy
-5. Create sub-ca provider
-6. Create configuration
+4. Create workload certificate policy: https://docs.venafi.cloud/firefly/policies/
+
+5. Create sub-ca provider: https://docs.venafi.cloud/firefly/policies/#to-create-a-policy
+
+6. Create configuration: https://docs.venafi.cloud/firefly/configurations/#create-a-configuration
 
 ## Firefly Helm chart installation
 
