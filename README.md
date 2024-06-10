@@ -163,7 +163,7 @@ data:
   config.yaml: |-
     bootstrap:
       vaas:
-        url: https://api.eu.venafi.cloud.   ### <<<<<<<<<<<<< RIGHT HERE!!!!!
+        url: https://api.eu.venafi.cloud.
         auth:
           privateKeyFile: /var/run/secrets/firefly.venafi.com/svc-acct.key
 ```
