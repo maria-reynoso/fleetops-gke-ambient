@@ -1,0 +1,33 @@
+# -- Setting acceptTerms to true is required to consent to the terms and conditions
+acceptTerms: true
+deployment:
+  image: registry.venafi.cloud/public/venafi-images/firefly
+  # -- Toggle for running the firefly controller inside the kubernetes
+  # cluster as an in-cluster Certificate Authority (CA).
+  enabled: true
+  # -- (string) REQUIRED: The ClientID of a your TLS Protect Cloud service account associated with the desired configuration.                                                          
+  venafiClientID: "39687224-228e-11ef-abc9-9618982ef33c"
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      add: ["IPC_LOCK"]
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1001
+crd:
+  # -- Installs the CRD in the cluster. Required to enable firefly with
+  # the given group.
+  enabled: true
+  # -- Group name of the issuer.
+  groupName: firefly.venafi.com
+approver:
+  # -- Enable or disable the creation of a ClusterRole and ClusterRoleBinding
+  # to allow an approver to approve CertificateRequest resources which use
+  # the Firefly issuer group name.
+  enabled: true
+  # -- The subject which will be granted permission to approve
+  # CertifcateRequest resources which use the Firefly issuer group.
+  subject:
+    kind: ServiceAccount
+    namespace: cert-manager
+    name: cert-manager-approver-policy

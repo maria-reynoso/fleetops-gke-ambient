@@ -40,10 +40,12 @@ helm repo update
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.5/cert-manager.crds.yaml
 
 # install cert-manager; this might take a little time
-helm install cert-manager jetstack/cert-manager \
-	--namespace cert-manager \
-	--create-namespace \
-	--version v1.14.5
+helm install \
+  cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --create-namespace \
+  --version v1.15.0 \
+  --set crds.enabled=true
 
 # We need this namespace to exist since our cert will be placed there
 kubectl create namespace istio-system
@@ -69,6 +71,25 @@ CLIENT_ID=39687224-228e-11ef-abc9-9618982ef33c
 ```
 
 4. Create workload certificate policy: https://docs.venafi.cloud/firefly/policies/
+
+Add the following values
+
+Subject Alternative Names (SAN):
+ 
+```sh
+# DNS
+istiod-basic.istio-system.svc
+istiod.istio-system.svc
+istio-csr.istio-system.svc
+cert-manager-istio-csr.istio-system.svc
+```
+
+We will set a URI SPIFFE SAN since Istio follows the SPIFFE standard for workload identity.
+
+```sh
+# URI Address (SAN)
+^spiffe://cluster\local/ns/.*/sa/.*
+```
 
 5. Create sub-ca provider: https://docs.venafi.cloud/firefly/policies/#to-create-a-policy
 
@@ -122,9 +143,29 @@ approver:
 Install Firefly:
 
 ```sh
-helm upgrade -i -n venafi --create-namespace firefly \
-  oci://registry.venafi.cloud/public/venafi-images/helm/firefly --version v1.2.0 \
-  -f firefly-values.yaml`
+helm upgrade firefly oci://registry.venafi.cloud/public/venafi-images/helm/firefly \
+  --install \
+  --create-namespace \
+  --namespace venafi \
+  --values charts/firefly/values.yaml \
+  --version v1.2.1
+```
+
+Update vass endpoint in the firefly-config configmap:
+
+```sh
+kubectl edit cm firefly-config -n venafi
+```
+
+```yaml
+apiVersion: v1
+data:
+  config.yaml: |-
+    bootstrap:
+      vaas:
+        url: https://api.eu.venafi.cloud.   ### <<<<<<<<<<<<< RIGHT HERE!!!!!
+        auth:
+          privateKeyFile: /var/run/secrets/firefly.venafi.com/svc-acct.key
 ```
 
 Check readness status in the logs to confirm that it bootstrapped itself an issuer certificate successfully!:
@@ -198,7 +239,7 @@ kubectl create secret generic -n istio-system root-cert --from-file=root-cert.pe
 helm upgrade -i -n istio-system cert-manager-istio-csr jetstack/cert-manager-istio-csr -f istio-csr-values.yaml
 ```
 
-## Install Istio with ambient mode and istio-csr
+## Install Istio with ambient mode
 
 By default in GKE, only kube-system has a defined ResourceQuota for the node-critical class. istio-cni and ztunnel both require the node-critical class, check the [docs](https://istio.io/latest/docs/ambient/install/platform-prerequisites/#google-kubernetes-engine-gke)
 

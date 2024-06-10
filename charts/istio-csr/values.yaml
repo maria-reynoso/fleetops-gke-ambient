@@ -1,5 +1,5 @@
 # Number of replicas of istio-csr to run.
-replicaCount: 1
+replicaCount: 3
 
 image:
   # Target image registry. This value is prepended to the target image repository, if set.
@@ -15,7 +15,7 @@ image:
   # Override the image tag to deploy by setting this variable.
   # If no value is set, the chart's appVersion is used.
   # +docs:property
-  # tag: vX.Y.Z
+  tag: v0.7.0
 
   # Target image digest. Override any tag, if set.
   # For example:
@@ -91,7 +91,7 @@ app:
     #      value: istio-csr
     additionalAnnotations:
     - name: firefly.venafi.com/policy-name
-      value: <REPLACE_WITH_POLICY_NAME_FROM_TLSPROTECT_CLOUD> #### TODO
+      value: ambient-policy
     issuer:
       # Issuer name set on created CertificateRequests for both istio-csr's
       # serving certificate and incoming gRPC CSRs.
@@ -166,17 +166,17 @@ app:
     # not using `default` as a revision, add the `default` revision here
     # anyway. The resulting certificate will include a DNS name that won't be
     # used, but will pass this constraint.
-    revisions: ["basics"]
+    revisions: ["basic"]
     # The namespace where the istio control-plane is running.
     namespace: istio-system
 
   controller:
+    configmapNamespaceSelector: "maistra.io/member-of=istio-system"
     leaderElectionNamespace: istio-system
     # If set, limit where istio-csr creates configmaps with root ca certificates. If unset, configmap created in ALL namespaces.
     # Example: maistra.io/member-of=istio-system
     # +docs:type=string
     # +docs:property
-    # configmapNamespaceSelector:
 
 # Optional extra volumes. Useful for mounting custom root CAs
 volumes:
