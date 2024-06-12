@@ -50,6 +50,17 @@ kubectl create namespace istio-system
 
 ## TLS Protect Cloud setup
 
+Alternative elevate tool can be used in order to configure TLS Protect Cloud:
+```sh
+docker run -v ${PWD}:<your_directory> mattiasgees/elevate:latest add -f <your_directory>/config.yaml --api-address https://api.eu.venafi.cloud -s <private_key_path> --api-key ${TLSPC_API_KEY} -t <TEAM> -p <subCA> --force
+
+
+-t is for team....the SA will be named after that
+-p is the subCA to use
+--force to create subCA if doesn't exits
+-s private key path
+```
+
 1. Signup for a [Venafi account](https://venafi.com/try-venafi/firefly/) if you don't have one
 
 2. Generate an RSA public private pem key pair using OpenSSL:
@@ -155,6 +166,7 @@ kubectl edit cm firefly-config -n venafi
 ```
 
 ```yaml
+# This will fixed by merging this PR: https://gitlab.com/venafi/vaas/applications/tls-protect/dmi/cli/firefly-ca/-/merge_requests/343
 apiVersion: v1
 data:
   config.yaml: |-
