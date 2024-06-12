@@ -1,0 +1,2 @@
+defaults:
+  caAddress: "cert-manager-istio-csr.istio-system.svc:443"

@@ -20,14 +20,14 @@ crd:
   enabled: true
   # -- Group name of the issuer.
   groupName: firefly.venafi.com
-approver:
-  # -- Enable or disable the creation of a ClusterRole and ClusterRoleBinding
-  # to allow an approver to approve CertificateRequest resources which use
-  # the Firefly issuer group name.
-  enabled: true
-  # -- The subject which will be granted permission to approve
-  # CertifcateRequest resources which use the Firefly issuer group.
-  subject:
-    kind: ServiceAccount
-    namespace: cert-manager
-    name: cert-manager-approver-policy
+  approver:
+    # -- Enable or disable the creation of a ClusterRole and ClusterRoleBinding
+    # to allow an approver to approve CertificateRequest resources which use
+    # the Firefly issuer group name.
+    enabled: true
+    # -- The subject which will be granted permission to approve
+    # CertifcateRequest resources which use the Firefly issuer group.
+    subject:
+      kind: ServiceAccount
+      namespace: cert-manager
+      name: cert-manager

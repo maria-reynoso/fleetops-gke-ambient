@@ -1,0 +1,31 @@
+defaults:
+  ## Discovery Settings
+  pilot:
+    env:
+      ENABLE_CA_SERVER: "false"
+
+  # meshConfig defines runtime configuration of components, including Istiod and istio-agent behavior
+  # See https://istio.io/docs/reference/config/istio.mesh.v1alpha1/ for all available options
+  meshConfig:
+    trustDomain: cluster.local
+
+  global:
+    # Used to locate istiod.
+    istioNamespace: istio-system
+    # Default hub for Istio images.
+    # Releases are published to docker hub under 'istio' project.
+    # Dev builds from prow are on gcr.io
+    proxy:
+      # CAUTION: It is important to ensure that all Istio helm charts specify the same clusterDomain value
+      # cluster domain. Default value is "cluster.local".
+      clusterDomain: "cluster.local"
+
+    ##############################################################################################
+    # The following values are found in other charts. To effectively modify these values, make   #
+    # make sure they are consistent across your Istio helm charts                                #
+    ##############################################################################################
+
+    # The customized CA address to retrieve certificates for the pods in the cluster.
+    # CSR clients such as the Istio Agent and ingress gateways can use this to specify the CA endpoint.
+    # If not set explicitly, default to the Istio discovery address.
+    caAddress: "cert-manager-istio-csr.istio-system.svc:443"

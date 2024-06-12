@@ -36,9 +36,6 @@ gcloud container clusters get-credentials $CLUSTER_NAME
 helm repo add jetstack https://charts.jetstack.io
 helm repo update
 
-# install cert-manager CRDs
-kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.5/cert-manager.crds.yaml
-
 # install cert-manager; this might take a little time
 helm install \
   cert-manager jetstack/cert-manager \
@@ -88,7 +85,7 @@ We will set a URI SPIFFE SAN since Istio follows the SPIFFE standard for workloa
 
 ```sh
 # URI Address (SAN)
-^spiffe://cluster\local/ns/.*/sa/.*
+^spiffe://cluster\.local/ns/.*/sa/.*
 ```
 
 5. Create sub-ca provider: https://docs.venafi.cloud/firefly/policies/#to-create-a-policy
@@ -235,8 +232,8 @@ You can now run the installation:
 
 ```sh
 kubectl create ns istio-system
-kubectl create secret generic -n istio-system root-cert --from-file=root-cert.pem=root.pem
-helm upgrade -i -n istio-system cert-manager-istio-csr jetstack/cert-manager-istio-csr -f istio-csr-values.yaml
+kubectl create secret generic -n istio-system root-cert --from-file=root-cert.pem=root-cert.pem
+helm upgrade -i -n istio-system cert-manager-istio-csr jetstack/cert-manager-istio-csr -f charts/istio-csr/values.yaml
 ```
 
 ## Install Istio with ambient mode
@@ -264,9 +261,55 @@ spec:
 EOF
 ```
 
+Install the Kubernetes Gateway API CRDs:
+
 ```sh
 kubectl get crd gateways.gateway.networking.k8s.io &> /dev/null || \
   { kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd/experimental?ref=v1.1.0" | kubectl apply -f -; }
+```
 
-istioctl install --set profile=ambient --set "components.ingressGateways[0].enabled=true" --set "components.ingressGateways[0].name=istio-ingressgateway" --skip-confirmation
+```sh
+# The base chart contains the basic CRDs and cluster roles required to set up Istio
+helm upgrade -i istio-base istio/base --version 1.22 -n istio-system --set defaultRevision=default
+# Install CNI
+helm install istio-cni istio/cni -n istio-system --set profile=ambient --version 1.22 --wait
+# Install Istiod
+helm upgrade -i istiod istio/istiod --namespace istio-system --set profile=ambient --version 1.22 -f charts/istio/values.yaml --wait
+# Install the ztunnel component
+helm upgrade -i ztunnel istio/ztunnel -n istio-system -f charts/istio/ztunnel-values.yaml --version 1.22 --wait
+```
+
+## Deploy app
+
+```sh
+kubectl apply -f samples/bookinfo.yaml
+kubectl apply -f samples/bookinfo-versions.yaml
+```
+
+sleep and notsleep are two simple applications that can serve as curl clients
+
+```sh
+kubectl apply -f samples/sleep.yaml
+kubectl apply -f samples/notsleep.yaml
+```
+
+Create a Kubernetes Gateway and HTTPRoute:
+
+```sh
+kubectl apply -f samples/bookinfo-gateway.yaml
+```
+
+Add applicatioin to ambient
+
+```sh
+kubectl label namespace default istio.io/dataplane-mode=ambient
+```
+
+traffic test:
+
+```sh
+kubectl exec deploy/sleep -- curl -s "http://$GATEWAY_HOST/productpage" | grep -o "<title>.*</title>"
+kubectl exec deploy/sleep -- curl -s http://productpage:9080/ | grep -o "<title>.*</title>"
+kubectl exec deploy/notsleep -- curl -s http://productpage:9080/ | grep -o "<title>.*</title>"
+# output: <title>Simple Bookstore App</title>
 ```
