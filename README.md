@@ -65,6 +65,8 @@ helm install istio-cni istio/cni -n istio-system --set profile=ambient --version
 helm upgrade -i istiod istio/istiod --namespace istio-system --set profile=ambient --version 1.22 -f charts/istio/values.yaml --wait
 # Install the ztunnel component
 helm upgrade -i ztunnel istio/ztunnel -n istio-system -f charts/istio/ztunnel-values.yaml --version 1.22 --wait
+# Install an ingress gateway
+helm install istio-ingress istio/gateway -n istio-ingress --create-namespace --wait
 ```
 
 ## Deploy app
