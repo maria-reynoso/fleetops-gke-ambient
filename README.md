@@ -52,54 +52,25 @@ EOF
 Install the Kubernetes Gateway API CRDs:
 
 ```sh
-kubectl get crd gateways.gateway.networking.k8s.io &> /dev/null || \
-  { kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd/experimental?ref=v1.1.0" | kubectl apply -f -; }
-```
-
-```sh
-# The base chart contains the basic CRDs and cluster roles required to set up Istio
-helm upgrade -i istio-base istio/base --version 1.22 -n istio-system --set defaultRevision=default
-# Install CNI
-helm install istio-cni istio/cni -n istio-system --set profile=ambient --version 1.22 --wait
-# Install Istiod
-helm upgrade -i istiod istio/istiod --namespace istio-system --set profile=ambient --version 1.22 -f charts/istio/values.yaml --wait
-# Install the ztunnel component
-helm upgrade -i ztunnel istio/ztunnel -n istio-system -f charts/istio/ztunnel-values.yaml --version 1.22 --wait
-# Install an ingress gateway
-helm install istio-ingress istio/gateway -n istio-ingress --create-namespace --wait
+make ambient
 ```
 
 ## Deploy app
 
 ```sh
-kubectl apply -f samples/bookinfo.yaml
-kubectl apply -f samples/bookinfo-versions.yaml
-```
-
-sleep and notsleep are two simple applications that can serve as curl clients
-
-```sh
-kubectl apply -f samples/sleep.yaml
-kubectl apply -f samples/notsleep.yaml
-```
-
-Create a Kubernetes Gateway and HTTPRoute:
-
-```sh
-kubectl apply -f samples/bookinfo-gateway.yaml
+make app
 ```
 
 Add applicatioin to ambient
 
 ```sh
-kubectl label namespace default istio.io/dataplane-mode=ambient
+kubectl label namespace bank-of-anthos istio.io/dataplane-mode=ambient
 ```
+
+_Note that you can apply this label to a namespace or to a single spsecific pod_
 
 traffic test:
 
 ```sh
-kubectl exec deploy/sleep -- curl -s "http://$GATEWAY_HOST/productpage" | grep -o "<title>.*</title>"
-kubectl exec deploy/sleep -- curl -s http://productpage:9080/ | grep -o "<title>.*</title>"
-kubectl exec deploy/notsleep -- curl -s http://productpage:9080/ | grep -o "<title>.*</title>"
-# output: <title>Simple Bookstore App</title>
+# TODO
 ```
