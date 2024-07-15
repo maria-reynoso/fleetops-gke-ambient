@@ -3,25 +3,8 @@
 
 ## Deploy cluster
 
-TODO: Deploy with Makefile
 ```sh
-export PROJECT_ID=`gcloud config get-value project` && \
-export M_TYPE=n1-standard-2 && \
-export ZONE=europe-west2-a && \
-export CLUSTER_NAME="ambient-mode" && \
-gcloud services enable container.googleapis.com && \
-gcloud container clusters create $CLUSTER_NAME \
-  --cluster-version latest \
-  --machine-type=$M_TYPE \
-  --num-nodes 4 \
-  --zone $ZONE \
-  --project $PROJECT_ID
-```
-
-Retrieve credentials:
-
-```sh
-gcloud container clusters get-credentials $CLUSTER_NAME
+make cluster
 ```
 
 ## Install Istio with ambient mode
@@ -57,14 +40,28 @@ make ambient
 
 ## Deploy app
 
+Deploy bank of anthos app in 2 different namespaces, one for ambient mode and the other one for sidecar mode:
+
 ```sh
-make app
+# Namespace bank-of-ambient
+make app-ambient
+```
+
+```sh
+# Namespace bank-of-sidecar
+make app-sidecar
 ```
 
 Add applicatioin to ambient
 
 ```sh
-kubectl label namespace bank-of-anthos istio.io/dataplane-mode=ambient
+kubectl label namespace bank-of-ambient istio.io/dataplane-mode=ambient
+```
+
+Add applicatioin to the mesh using sidcecars
+
+```sh
+kubectl label namespace bank-of-sidecar istio-injection=enabled
 ```
 
 _Note that you can apply this label to a namespace or to a single spsecific pod_
