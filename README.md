@@ -14,6 +14,7 @@ By default in GKE, only kube-system has a defined ResourceQuota for the node-cri
 Create ResourceQuota into istio-system namespace:
 
 ```sh
+kubectl create namespace istio-system
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: ResourceQuota
@@ -52,19 +53,52 @@ make app-ambient
 make app-sidecar
 ```
 
-Add applicatioin to ambient
+Add your applicatioin to ambient
+_Note that you can apply this label to a namespace or to a single spsecific pod_
 
 ```sh
 kubectl label namespace bank-of-ambient istio.io/dataplane-mode=ambient
 ```
 
-Add applicatioin to the mesh using sidcecars
+Add the same application to the mesh using sidcecars in a different namespace:
 
 ```sh
 kubectl label namespace bank-of-sidecar istio-injection=enabled
 ```
 
-_Note that you can apply this label to a namespace or to a single spsecific pod_
+Restart pods:
+
+```sh
+kubectl -n bank-of-sidecar rollout restart deploy
+```
+
+Deploy Gateway and VirtualService to access the frontend through the IngressGateway:
+
+```sh
+kubectl apply -f frontend-ingress.yaml -n bank-of-ambient
+```
+
+## Viewing your mesh dashboard
+
+Google Monitoring app metrics dashboard:
+
+```sh
+gcloud monitoring dashboards create --config-from-file=dashboard.json
+```
+
+Deploy Kiali, prometheus, grafana:
+
+```sh
+kubectl apply -f addons
+```
+
+```sh
+istioctl dashboard kiali
+```
+
+```sh
+istioctl dashboard grafana
+```
 
 traffic test:
 
