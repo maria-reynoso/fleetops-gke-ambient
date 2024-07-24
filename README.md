@@ -53,7 +53,7 @@ make app-ambient
 make app-sidecar
 ```
 
-Add your applicatioin to ambient
+Add your application to ambient
 _Note that you can apply this label to a namespace or to a single spsecific pod_
 
 ```sh
@@ -78,6 +78,18 @@ Deploy Gateway and VirtualService to access the frontend through the IngressGate
 kubectl apply -f frontend-ingress.yaml -n bank-of-ambient
 ```
 
+Check logs of Ztunnel
+
+```sh
+kubectl logs -n istio-system $ZTUNNEL_POD
+```
+
+Debbug Ztunnel:
+
+```sh
+istioctl x ztunnel-config workloads
+```
+
 ## Viewing your mesh dashboard
 
 Google Monitoring app metrics dashboard:
@@ -100,8 +112,12 @@ istioctl dashboard kiali
 istioctl dashboard grafana
 ```
 
-traffic test:
+## Performance testing
+
+We will use [Fortio](https://fortio.org/), which is a load testing tool developed by Istio.
+
+Let's first deploy the Fortio operator:
 
 ```sh
-# TODO
+kubectl create -f https://raw.githubusercontent.com/verfio/fortio-operator/master/deploy/fortio.yaml
 ```
