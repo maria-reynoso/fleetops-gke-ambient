@@ -6,10 +6,12 @@ metadata:
 spec:
   selector:
     matchLabels:
+      #Policy is applied to pods with app: frontend label
       app: frontend
   action: ALLOW
   rules:
   - from:
     - source:
         principals:
+        # allows calls only from istio-ingress service account
         - cluster.local/ns/istio-ingress/sa/istio-ingress
