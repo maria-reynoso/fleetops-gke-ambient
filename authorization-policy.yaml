@@ -15,3 +15,4 @@ spec:
         principals:
         # allows calls only from istio-ingress service account
         - cluster.local/ns/istio-ingress/sa/istio-ingress
+        - cluster.local/ns/bank-of-ambient/sa/sleep

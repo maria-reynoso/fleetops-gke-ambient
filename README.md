@@ -133,7 +133,13 @@ Access kiali and see the graph
 istioctl dashboard kiali
 ```
 
-Create an authorization policy to only allow calls from loadgenerator 
+Deploy the simple sleep service. This will be used to curl our frontend
+
+```sh
+kubectl apply -f istio-1.22.3/samples/sleep/sleep.yaml -n bank-of-ambient
+```
+
+Create an authorization policy to only allow calls from istio-ingress and sleep service:
 
 ```sh
 kubectl apply -f authorization-policy.yaml
@@ -167,12 +173,6 @@ kubectl get pods -n bank-of-ambient
 kubectl get gtw -n bank-of-ambient
 ```
 
-Deploy the simple sleep service. This will be used to curl our frontend
-
-```sh
-kubectl apply -f istio-1.22.3/samples/sleep/sleep.yaml -n bank-of-ambient
-```
-
 Autorization policy
 
 ```sh
@@ -194,7 +194,7 @@ We will use [Fortio](https://fortio.org/), which is a load testing tool develope
 kubectl apply -f fortio.yaml
 ```
 
-Launch Fortio web interface to configure and performe latency tests:
+Launch Fortio web interface to configure and perform latency tests:
 
 ```sh
 kubectl port-forward svc/fortio 8080:8080
