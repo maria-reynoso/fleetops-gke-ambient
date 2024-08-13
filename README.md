@@ -136,7 +136,7 @@ istioctl dashboard kiali
 Deploy the simple sleep service. This will be used to curl our frontend
 
 ```sh
-kubectl apply -f istio-1.22.3/samples/sleep/sleep.yaml -n bank-of-ambient
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/sleep/sleep.yaml -n bank-of-ambient
 ```
 
 Create an authorization policy to only allow calls from istio-ingress and sleep service:
