@@ -115,7 +115,7 @@ stern ztunnel -n istio-system
 Debbug Ztunnel:
 
 ```sh
-istioctl x ztunnel-config workloads
+istioctl ztunnel-config workloads
 ```
 
 ## Mesh in action
@@ -163,7 +163,7 @@ kubectl get crd gateways.gateway.networking.k8s.io &> /dev/null || \
 Enable waypoint proxy
 
 ```sh
-istioctl x waypoint apply --enroll-namespace -n bank-of-ambient --wait
+istioctl waypoint apply --enroll-namespace -n bank-of-ambient --wait
 ```
 
 Validate a Pod and a Gateway is created for waypoint proxy
@@ -199,6 +199,3 @@ Launch Fortio web interface to configure and perform latency tests:
 ```sh
 kubectl port-forward svc/fortio 8080:8080
 ```
-
-ISTIO_INGRESS=34.147.178.37
-bank of sidecar IP: 34.105.185.155
