@@ -1,5 +1,6 @@
 # Istio Ambient on GKE
 
+To demonstrate Ambient on a GKE cluster and comparing resources consumption and latency between ambient and sidecars.
 
 ## Deploy cluster
 
