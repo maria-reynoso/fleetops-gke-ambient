@@ -2,6 +2,10 @@
 
 To demonstrate Ambient on a GKE cluster and comparing resources consumption and latency between ambient and sidecars.
 
+## Requirements
+
+- Install [istioctl](https://istio.io/latest/docs/ops/diagnostic-tools/istioctl/#install-hahahugoshortcode709s2hbhb)
+
 ## Deploy cluster
 
 ```sh
