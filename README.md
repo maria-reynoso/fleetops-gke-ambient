@@ -5,7 +5,6 @@ To demonstrate Ambient on a GKE cluster and comparing resources consumption and 
 ## Requirements
 
 - Install [istioctl](https://istio.io/latest/docs/ops/diagnostic-tools/istioctl/#install-hahahugoshortcode709s2hbhb)
-- GCP Account
 
 ## Deploy cluster
 
